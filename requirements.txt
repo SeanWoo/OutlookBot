@@ -1,0 +1,4 @@
+vk==2.0.2
+IMAPClient==2.2.0
+vk_api==11.9.4
+mail_parser==3.15.0
