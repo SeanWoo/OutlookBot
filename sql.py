@@ -1,6 +1,6 @@
 import sqlite3 as sql
 
-con = sql.connect('test.db', check_same_thread=False)
+con = sql.connect('database.db', check_same_thread=False)
 cur = con.cursor()
 cur.execute("CREATE TABLE IF NOT EXISTS `chatIds` (id INTEGER PRIMARY KEY AUTOINCREMENT, chat_id INTEGER)")
 con.commit()
