@@ -6,7 +6,8 @@ class Email:
         self.from_as_string = mail.headers["From"]
         self.to_as_string = mail.headers["To"]
         self.subject = mail.headers["Subject"]
-        self.to = mail.mail["to"]
+        self.from_email = mail.mail["from"]
+        self.to_email = mail.mail["to"]
 
         self.body = None
 

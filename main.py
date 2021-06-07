@@ -4,6 +4,7 @@ import random
 import vk_api, vk
 import threading
 import time
+import logging
 from vk_api.keyboard import VkKeyboard, VkKeyboardColor
 from vk_api.utils import get_random_id
 from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
@@ -26,6 +27,7 @@ with open("config.json", "r") as f:
     PASSWORD = data["password"]
     PRINT_BODY = data["print_body"]
     NEED_FILTER = data["need_filter"]
+    INPUT_FILTERS = data["input_filters"]
     FILTERS = data["filters"]
 
 vk_session = vk_api.VkApi(token=VK_TOKEN)
@@ -36,10 +38,15 @@ vk = vk_session.get_api()
 chats_ids = []
 
 def filterEmails(x):
-    for i in x.to:
+    result = False
+    for i in x.to_email:
         if i[1] in FILTERS:
-            return True 
-    return False
+            result = True 
+
+    for i in x.from_email:
+        if i[1] in INPUT_FILTERS:
+            result = False
+    return result
 
 def get_emails():
     emails = []
