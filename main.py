@@ -12,6 +12,7 @@ from vk_api.longpoll import VkLongPoll, VkEventType
 from imapclient import IMAPClient
 from emailClass import Email
 from sql import ChatRepository
+import requests
 
 chatRepository = ChatRepository()
 
@@ -101,36 +102,40 @@ def update_emails():
 
 th = threading.Thread(target=update_emails)
 th.start()
-
-for event in longpoll.listen():
-    if event.type == VkBotEventType.MESSAGE_NEW:
-        if 'Включить рассылку' in str(event):
-            if event.from_chat:
-                message = 'Рассылка включена!'
-                if not chatRepository.get(event.chat_id):
-                    chatRepository.subscribe(event.chat_id)
-                else:
-                    message = "Рассылка уже была включена!"
-                vk.messages.send(
-                    key = (VK_KEY),
-                    server = (VK_SERVER),
-                    ts=(VK_TS),
-                    random_id = get_random_id(),
-                    message=message,
-                    chat_id = event.chat_id
-                )
-        elif 'Выключить рассылку' in str(event):
-            if event.from_chat:
-                message = 'Рассылка выключена!'
-                if chatRepository.get(event.chat_id):
-                    chatRepository.unsubscribe(event.chat_id)
-                else:
-                    message = "Рассылка уже была выключена!"
-                vk.messages.send(
-                    key = (VK_KEY),
-                    server = (VK_SERVER),
-                    ts=(VK_TS),
-                    random_id = get_random_id(),
-                    message=message,
-                    chat_id = event.chat_id
-                )
+while True:
+    try:
+        for event in longpoll.listen():
+            if event.type == VkBotEventType.MESSAGE_NEW:
+                if 'Включить рассылку' in str(event):
+                    if event.from_chat:
+                        message = 'Рассылка включена!'
+                        if not chatRepository.get(event.chat_id):
+                            chatRepository.subscribe(event.chat_id)
+                        else:
+                            message = "Рассылка уже была включена!"
+                        vk.messages.send(
+                            key = (VK_KEY),
+                            server = (VK_SERVER),
+                            ts=(VK_TS),
+                            random_id = get_random_id(),
+                            message=message,
+                            chat_id = event.chat_id
+                        )
+                elif 'Выключить рассылку' in str(event):
+                    if event.from_chat:
+                        message = 'Рассылка выключена!'
+                        if chatRepository.get(event.chat_id):
+                            chatRepository.unsubscribe(event.chat_id)
+                        else:
+                            message = "Рассылка уже была выключена!"
+                        vk.messages.send(
+                            key = (VK_KEY),
+                            server = (VK_SERVER),
+                            ts=(VK_TS),
+                            random_id = get_random_id(),
+                            message=message,
+                            chat_id = event.chat_id
+                        )
+    except requests.exceptions.RequestException:
+        print('FUCKING VK OFFING SERVER \n RECONNECT SERVER')
+        continue
